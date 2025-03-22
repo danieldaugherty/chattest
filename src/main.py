@@ -7,8 +7,10 @@ from reporting_module import ReportingModule
 
 def main():
     parser = argparse.ArgumentParser(description="chattest framework")
-    parser.add_argument('--prompt_key', type=str, required=True, help='Key of the prompt to test')
-    parser.add_argument('--verbosity', type=int, default=1, help='Verbosity level of the output')
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-p', '--prompt-key', type=str, help='Key of the prompt to test')
+    group.add_argument('-a', '--all-prompts', action='store_true', help='Run all prompts')
+#     parser.add_argument('--verbosity', type=int, default=1, help='Verbosity level of the output')
     args = parser.parse_args()
 
     try:
@@ -18,10 +20,13 @@ def main():
         models = config_loader.load_models()
 
         # Filter prompts based on the provided prompt key
-        selected_prompts = [prompt for prompt in prompts if prompt.key == args.prompt_key]
-        if not selected_prompts:
-            print(f"No prompt found with key: {args.prompt_key}")
-            sys.exit(1)
+        if args.prompt_key:
+            selected_prompts = [prompt in prompts if prompt.key == args.prompt_key]
+            if not selected_prompts:
+                print(f"No prompt found with key: {args.prompt_key}")
+                sys.exit(1)
+        else:
+            selected_prompts = prompts
 
         # Run inference
         inference_runner = InferenceRunner(selected_prompts, models)
