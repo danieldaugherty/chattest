@@ -49,9 +49,5 @@ class ConfigLoader:
         return prompts
 
     def load_models(self) -> List[ModelConfig]:
-        model_data = self.load_json_files(self.models_dir)
-        models = []
-        for data in model_data:
-            if self.validate_model_config(data):
-                models.append(ModelConfig(**data))
-        return models
+        from models_config import model_configs
+        return model_configs
